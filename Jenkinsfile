@@ -18,20 +18,36 @@ pipeline {
 
         stage('Unit Tests') {
             steps {
-                sh './gradlew test'
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    sh './gradlew test'
+                }
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('YourSonarQubeServer') {
-                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-                    sh "./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN"
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    withSonarQubeEnv('YourSonarQubeServer') {
+                        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                            sh "./gradlew sonarqube -Dsonar.login=$SONAR_TOKEN"
+                        }
                     }
                 }
             }
         }
     }
+
+    post {
+        always {
+            echo 'Pipeline completed.'
+        }
+
+        success {
+            echo 'Pipeline succeeded.'
+        }
+
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
 }
-
-
