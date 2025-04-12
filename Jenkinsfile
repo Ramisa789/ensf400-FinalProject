@@ -13,8 +13,6 @@ pipeline {
         stage('Build Container') {
         steps {
             sh 'docker build -t finalproject-image .'  
-            sh 'docker tag finalproject-image hannagracec/ensf400-finalproject:v1'  
-            sh 'docker push hannagracec/ensf400-finalproject:v1'  
         }
     }
 
